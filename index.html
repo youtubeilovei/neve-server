@@ -55,7 +55,21 @@
             border-radius: 50%;
         }
 
-        /* 흐르는 빛/별 효과 */
+        /* 마우스 따라다니는 별 파티클 효과 */
+        .cursor-trail {
+            position: fixed;
+            pointer-events: none;
+            width: 6px;
+            height: 6px;
+            background: #ff6b6b;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #ff4b4b, 0 0 20px #ff4b4b;
+            z-index: 9999;
+            transition: transform 0.1s ease-out;
+            opacity: 0.8;
+        }
+
+        /* 배경 흐르는 별/빛 효과 */
         .particle {
             position: absolute;
             background: white;
@@ -88,8 +102,8 @@
             justify-content: space-between;
             align-items: center;
             padding: 20px 80px;
-            background: rgba(5, 5, 8, 0.7);
-            backdrop-filter: blur(10px);
+            background: rgba(5, 5, 8, 0.75);
+            backdrop-filter: blur(12px);
             z-index: 1000;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
@@ -166,7 +180,7 @@
 
         /* 메인 컨텐츠 영역 */
         main {
-            padding-top: 180px;
+            padding-top: 220px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -175,6 +189,7 @@
             padding-right: 20px;
             max-width: 1200px;
             margin: 0 auto;
+            min-height: 80vh;
         }
 
         .badge {
@@ -213,7 +228,7 @@
         .button-group {
             display: flex;
             gap: 15px;
-            margin-bottom: 80px;
+            margin-bottom: 100px;
         }
 
         .btn {
@@ -253,57 +268,20 @@
             transform: translateY(-2px);
         }
 
-        /* 하단 카드 섹션 */
-        .features {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 25px;
-            width: 100%;
-            margin-bottom: 80px;
-        }
-
-        .card {
-            background: rgba(15, 15, 25, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            padding: 30px;
-            border-radius: 16px;
-            text-align: left;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(255, 75, 75, 0.4);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        .card h3 {
-            font-size: 18px;
-            margin-bottom: 10px;
-            color: #fff;
-        }
-
-        .card p {
-            font-size: 14px;
-            color: #8a8a9e;
-            line-height: 1.5;
-        }
-
-        /* 규칙 페이지 섹션 스타일 */
-        .rules-container {
+        /* ---------------- 공통 콘텐츠 뷰 레이아웃 (세계관 / 규칙) ---------------- */
+        .content-view {
             width: 100%;
             max-width: 900px;
             margin: 40px auto 100px auto;
             text-align: left;
-            display: none; /* 평소엔 숨김, 메뉴 클릭시 토글 가능 */
+            display: none;
         }
 
-        .rules-container.active {
+        .content-view.active {
             display: block;
         }
 
-        .rules-title {
+        .view-title {
             font-size: 32px;
             font-weight: 800;
             margin-bottom: 30px;
@@ -312,6 +290,42 @@
             padding-left: 15px;
         }
 
+        /* 세계관 (스토리) 스타일 */
+        .story-box {
+            background: rgba(15, 15, 25, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 50px 40px;
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+
+        .story-box h2 {
+            font-size: 26px;
+            color: #fff;
+            margin-bottom: 15px;
+        }
+
+        .story-box p {
+            color: #9a9ab0;
+            font-size: 15px;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+
+        .coming-soon-badge {
+            display: inline-block;
+            background: rgba(255, 75, 75, 0.1);
+            border: 1px dashed rgba(255, 75, 75, 0.4);
+            color: #ff6b6b;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        /* 규칙 페이지 스타일 */
         .rule-category {
             background: rgba(15, 15, 25, 0.75);
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -322,7 +336,7 @@
         }
 
         .rule-category h2 {
-            font-size: 22px;
+            font-size: 20px;
             color: #ff6b6b;
             margin-bottom: 20px;
             display: flex;
@@ -343,7 +357,7 @@
         }
 
         .rule-item h4 {
-            font-size: 16px;
+            font-size: 15px;
             color: #fff;
             margin-bottom: 6px;
         }
@@ -384,30 +398,31 @@
             header { padding: 20px; }
             .nav-links { display: none; }
             h1 { font-size: 32px; }
-            .features { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
+
+    <!-- 마우스 커서 별빛 이펙트 요소 -->
+    <div class="cursor-trail" id="cursorTrail"></div>
 
     <div class="night-sky">
         <div class="moon"></div>
     </div>
 
     <header>
-        <div class="logo" onclick="showMain()">NEVE SERVER</div>
+        <div class="logo" onclick="switchTab('main')">NEVE SERVER</div>
         <ul class="nav-links">
             <li>
                 <a href="#">서버 소개</a>
                 <ul class="dropdown">
-                    <li><a href="#" onclick="showMain()">서버 세계관</a></li>
-                    <li><a href="#" onclick="showMain()">핵심 시스템</a></li>
+                    <li><a href="#" onclick="switchTab('story')">서버 세계관</a></li>
                 </ul>
             </li>
             <li>
                 <a href="#">규칙</a>
                 <ul class="dropdown">
-                    <li><a href="#rules" onclick="showRules()">전체 규칙 보기</a></li>
+                    <li><a href="#" onclick="switchTab('rules')">전체 규칙 보기</a></li>
                 </ul>
             </li>
             <li><a href="https://discord.gg/c3cWQPz4KY" target="_blank">디스코드</a></li>
@@ -415,7 +430,7 @@
     </header>
 
     <!-- 메인 홈 화면 -->
-    <main id="main-content">
+    <main id="view-main" class="content-view active">
         <div class="badge">🔥 지금까지 못 느꼈던 진짜 반아생</div>
         <h1>낭만과 야수가 공존하는<br><span>경제 약탈 CPVP 서버</span></h1>
         <p class="subtitle">거친 무법지대 속에서 피어나는 뜨거운 낭만. 자원을 약탈하고 영토를 지켜내며, 신성한 하드코어 CPVP의 세계로 여러분을 초대합니다.</p>
@@ -424,26 +439,21 @@
             <button class="btn btn-primary" onclick="copyIP()">서버 주소 복사</button>
             <a href="https://discord.gg/c3cWQPz4KY" target="_blank" class="btn btn-secondary">디스코드 입장하기</a>
         </div>
-
-        <div class="features" id="features">
-            <div class="card">
-                <h3>⚔️ 하드코어 CPVP</h3>
-                <p>손에 땀을 유발하는 긴장감 넘치는 전투 시스템. 빈틈을 노리고 상대를 제압하여 전장을 지배하세요.</p>
-            </div>
-            <div class="card">
-                <h3>💰 경제 & 약탈</h3>
-                <p>노력으로 쌓아 올린 자산을 지키고, 빼앗고 빼앗기는 치열한 경제 약탈의 쾌감을 느껴보세요.</p>
-            </div>
-            <div class="card">
-                <h3>⚙️ 자동 리셋 시스템</h3>
-                <p>항상 신선하고 쾌적한 파밍 환경을 제공하기 위해 체계적인 자동 지역 리셋 프레임워크가 가동됩니다.</p>
-            </div>
-        </div>
     </main>
 
-    <!-- 규칙 상세 페이지 (규칙 클릭 시 노출) -->
-    <div id="rules-section" class="rules-container">
-        <div class="rules-title">NEVE SERVER RULES</div>
+    <!-- 서버 세계관 (스토리) 페이지 -->
+    <div id="view-story" class="content-view">
+        <div class="view-title">SERVER STORY</div>
+        <div class="story-box">
+            <h2>네브 서버의 세계관</h2>
+            <p>끝없는 황무지와 약탈이 지배하는 거친 세계.<br>살아남기 위해 연합을 맺고, 때로는 등을 돌려야 하는 냉혹한 야생의 기록이 시작됩니다.</p>
+            <div class="coming-soon-badge">-# 준비중</div>
+        </div>
+    </div>
+
+    <!-- 규칙 상세 페이지 -->
+    <div id="view-rules" class="content-view">
+        <div class="view-title">NEVE SERVER RULES</div>
         
         <!-- 1. 채팅 관련 규칙 -->
         <div class="rule-category">
@@ -523,7 +533,25 @@
     <div id="toast" class="toast">서버 주소(neve.labmc.kr)가 복사되었습니다!</div>
 
     <script>
-        // 1. 흐르는 배경 별/빛 효과 생성기
+        // 1. 마우스 커서 따라다니는 별 파티클 효과
+        const cursorTrail = document.getElementById('cursorTrail');
+        let mouseX = 0, mouseY = 0;
+        let cursorX = 0, cursorY = 0;
+
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        function animateCursor() {
+            cursorX += (mouseX - cursorX) * 0.15;
+            cursorY += (mouseY - cursorY) * 0.15;
+            cursorTrail.style.transform = `translate(${cursorX - 3}px, ${cursorY - 3}px)`;
+            requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
+
+        // 2. 흐르는 배경 별/빛 효과 생성기
         const nightSky = document.querySelector('.night-sky');
         const particleCount = 45;
 
@@ -546,7 +574,7 @@
             nightSky.appendChild(particle);
         }
 
-        // 2. 서버 주소 복사 기능 & 토스트 알림
+        // 3. 서버 주소 복사 기능 & 토스트 알림
         function copyIP() {
             const ip = "neve.labmc.kr";
             navigator.clipboard.writeText(ip).then(() => {
@@ -558,16 +586,13 @@
             });
         }
 
-        // 3. 화면전환 함수 (메인 <-> 규칙)
-        function showRules() {
-            document.getElementById('main-content').style.display = 'none';
-            document.getElementById('rules-section').classList.add('active');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function showMain() {
-            document.getElementById('rules-section').classList.remove('active');
-            document.getElementById('main-content').style.display = 'flex';
+        // 4. 싱글 페이지 탭 전환 함수 (메인 / 세계관 / 규칙)
+        function switchTab(tabName) {
+            document.querySelectorAll('.content-view').forEach(view => {
+                view.classList.remove('active');
+            });
+            
+            document.getElementById('view-' + tabName).classList.add('active');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     </script>
